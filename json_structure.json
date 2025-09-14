@@ -1,0 +1,223 @@
+{
+  "canvas": {
+    "width": "integer (required)",
+    "height": "integer (required)",
+    "background": "hex color string (optional, default: '#000000')"
+  },
+  "layers": [
+    {
+      "radial_gradient": {
+        "type": "gradient",
+        "gradient_type": "radial",
+        "colors": "array of hex color strings (new format)",
+        "stops": "array of float values 0-1 (optional, default: evenly spaced)",
+        "start_color": "hex color string (legacy format)",
+        "end_color": "hex color string (legacy format)",
+        "x": "pixel value or percentage string (default: '50%')",
+        "y": "pixel value or percentage string (default: '50%')",
+        "width": "pixel value or percentage string (default: canvas width)",
+        "height": "pixel value or percentage string (default: canvas height)",
+        "opacity": "float 0.0-1.0 (default: 1.0)",
+        "anchor": "string: top-left|center|top-center|center-left|center-right|bottom-left|bottom-center|bottom-right (default: 'top-left')"
+      }
+    },
+    {
+      "linear_gradient": {
+        "type": "gradient",
+        "gradient_type": "linear",
+        "colors": "array of hex color strings (required)",
+        "stops": "array of float values 0-1 (optional, default: evenly spaced)",
+        "angle": "float degrees (default: 0, 0=left-to-right, 90=top-to-bottom)",
+        "opacity": "float 0.0-1.0 (default: 1.0)",
+        "width": "pixel value or percentage string (default: canvas width)",
+        "height": "pixel value or percentage string (default: canvas height)",
+        "anchor": "string: top-left|center|top-center|center-left|center-right|bottom-left|bottom-center|bottom-right (default: 'top-left')"
+      }
+    },
+    {
+      "mesh_gradient": {
+        "type": "gradient",
+        "gradient_type": "mesh",
+        "mesh_points": "array of objects with x, y, color properties (required)",
+        "opacity": "float 0.0-1.0 (default: 1.0)"
+      }
+    },
+    {
+      "shape_blur_gradient": {
+        "type": "gradient",
+        "gradient_type": "shape_blur",
+        "colors": "array of hex color strings (required for base gradient)",
+        "stops": "array of float values 0-1 (optional)",
+        "angle": "float degrees (for linear base gradient)",
+        "shape_gradient_type": "string: 'linear'|'radial' (default: 'linear')",
+        "shape": "string: 'ellipse'|'rect' (default: 'ellipse')",
+        "shape_x": "pixel value or percentage string (default: '0%')",
+        "shape_y": "pixel value or percentage string (default: '0%')",
+        "shape_width": "pixel value or percentage string (default: '100%')",
+        "shape_height": "pixel value or percentage string (default: '100%')",
+        "blur_radius": "integer pixels (default: 20)",
+        "opacity": "float 0.0-1.0 (default: 1.0)"
+      }
+    },
+    {
+      "color_overlay": {
+        "type": "color_overlay",
+        "color": "hex color string (required)",
+        "width": "pixel value or percentage string (default: canvas width)",
+        "height": "pixel value or percentage string (default: canvas height)",
+        "x": "pixel value or percentage string (default: 0)",
+        "y": "pixel value or percentage string (default: 0)",
+        "anchor": "string: top-left|center|top-center|center-left|center-right|bottom-left|bottom-center|bottom-right (default: 'top-left')",
+        "opacity": "float 0.0-1.0 (default: 1.0)",
+        "blur": "integer pixels (default: 0)"
+      }
+    },
+    {
+      "spray_noise": {
+        "type": "spray_noise",
+        "center_x": "pixel value or percentage string (default: '70%')",
+        "center_y": "pixel value or percentage string (default: '20%')",
+        "radius_x": "pixel value or percentage string (default: '30%')",
+        "radius_y": "pixel value or percentage string (default: '15%')",
+        "color1": "hex color string (default: '#44defb')",
+        "color2": "hex color string (default: '#d97bfd')",
+        "opacity": "float 0.0-1.0 (default: 0.2)",
+        "noise_scale": "float (default: 1.6, higher = finer dots)",
+        "strength": "float (default: 0.7, lower = more holes)"
+      }
+    },
+    {
+      "ellipse_shape": {
+        "type": "shape",
+        "shape": "ellipse",
+        "color": "hex color string (required)",
+        "width": "pixel value or percentage string (default: 100)",
+        "height": "pixel value or percentage string (default: 100)",
+        "opacity": "float 0.0-1.0 (default: 1.0)",
+        "blur": "integer pixels (default: 0)",
+        "anchor": "string: top-left|center|top-center|center-left|center-right|bottom-left|bottom-center|bottom-right (default: 'top-left')",
+        "x": "pixel value or percentage string (default: 0)",
+        "y": "pixel value or percentage string (default: 0)"
+      }
+    },
+    {
+      "polygon_shape": {
+        "type": "shape",
+        "shape": "polygon",
+        "color": "hex color string (required)",
+        "points": "array of [x, y] coordinate pairs (required, supports pixel/percentage)",
+        "opacity": "float 0.0-1.0 (default: 1.0)",
+        "blur": "integer pixels (default: 0)"
+      }
+    },
+    {
+      "image": {
+        "type": "image",
+        "src": "string file path (required)",
+        "x": "pixel value or percentage string (default: 0)",
+        "y": "pixel value or percentage string (default: 0)",
+        "anchor": "string: top-left|center|top-center|center-left|center-right|bottom-left|bottom-center|bottom-right (default: 'top-left')",
+        "width": "pixel value or percentage string (optional, for resizing)",
+        "height": "pixel value or percentage string (optional, for resizing)",
+        "opacity": "float 0.0-1.0 (default: 1.0)",
+        "angle": "integer degrees rotation (default: 0)",
+        "flip": "boolean vertical flip (default: false)",
+        "flop": "boolean horizontal flip (default: false)",
+        "filters": "array of filter objects (optional)"
+      }
+    },
+    {
+      "image_filters": {
+        "gaussian_blur": {
+          "type": "gaussian_blur",
+          "radius": "integer pixels (default: 5)"
+        },
+        "grayscale": {
+          "type": "grayscale"
+        },
+        "brightness_contrast": {
+          "type": "brightness_contrast",
+          "brightness": "float factor (default: 1.0)",
+          "contrast": "float factor (default: 1.0)"
+        }
+      }
+    },
+    {
+      "text": {
+        "type": "text",
+        "text": "string content (required)",
+        "font": "string file path (optional)",
+        "size": "integer pixels (default: 32)",
+        "color": "hex color string (default: '#ffffff')",
+        "x": "pixel value or percentage string (default: 0)",
+        "y": "pixel value or percentage string (default: 0)",
+        "anchor": "string: top-left|center|top-center|center-left|center-right|bottom-left|bottom-center|bottom-right (default: 'top-left')",
+        "align": "string: left|center|right (default: 'left')",
+        "opacity": "float 0.0-1.0 (default: 1.0)",
+        "weight": "string: normal|bold (default: 'normal')",
+        "stroke_color": "hex color string (optional)",
+        "stroke_width": "integer pixels (default: 0)",
+        "line_height": "float multiplier (default: 1.0)",
+        "letter_spacing": "integer pixels (default: 0)",
+        "transform": "string: uppercase|lowercase|capitalize (optional)",
+        "shadow": "object (optional)"
+      }
+    },
+    {
+      "text_shadow": {
+        "offset_x": "integer pixels (default: 2)",
+        "offset_y": "integer pixels (default: 2)",
+        "color": "hex color string (default: '#000000')",
+        "opacity": "float 0.0-1.0 (default: 0.5)"
+      }
+    },
+    {
+      "mesh_point": {
+        "x": "pixel value or percentage string (required)",
+        "y": "pixel value or percentage string (required)",
+        "color": "hex color string (required)"
+      }
+    }
+  ],
+  "usage_examples": {
+    "complete_config": {
+      "canvas": {
+        "width": 1920,
+        "height": 1080,
+        "background": "#000000"
+      },
+      "layers": [
+        {
+          "type": "gradient",
+          "gradient_type": "radial",
+          "colors": ["#ff0000", "#00ff00", "#0000ff"],
+          "x": "50%",
+          "y": "50%",
+          "opacity": 0.8
+        },
+        {
+          "type": "text",
+          "text": "COSMIC POSTER",
+          "size": 72,
+          "color": "#ffffff",
+          "anchor": "center",
+          "stroke_width": 2,
+          "stroke_color": "#000000"
+        },
+        {
+          "type": "image",
+          "src": "logo.png",
+          "width": "30%",
+          "anchor": "bottom-right",
+          "opacity": 0.9,
+          "filters": [
+            {
+              "type": "gaussian_blur",
+              "radius": 3
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

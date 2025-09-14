@@ -1,0 +1,59 @@
+{
+  "canvas": {
+    "width": 1920,
+    "height": 1080,
+    "background": "#08106E"
+  },
+  "layers": [
+    {
+      "type": "color_overlay",
+      "color": "#08106E",
+      "x": "0%",
+      "y": "0%",
+      "width": "100%",
+      "height": "100%",
+      "opacity": 0.9,
+      "blur": 30
+    },
+    {
+      "type": "gradient",
+      "gradient_type": "radial",
+      "start_color": "#35E2FC",
+      "end_color": "#E831DF",
+      "colors": ["#35E2FC", "#E831DF", "#08106E"],
+      "stops": [0, 0.7, 1],
+      "x": "0%",
+      "y": "100%",
+      "width": "200%",
+      "height": "200%",
+      "opacity": 1,
+      "anchor": "top-right"
+    },
+    {
+      "type": "gradient",
+      "gradient_type": "radial",
+      "start_color": "#35E2FC",
+      "end_color": "#E831DF",
+      "colors": ["#35E2FC", "#E831DF", "#08106E"],
+      "stops": [0, 0.7, 1],
+      "x": "100%",
+      "y": "0%",
+      "width": "200%",
+      "height": "200%",
+      "opacity": 1,
+      "anchor": "top-right"
+    },
+    {
+      "type": "spray_noise",
+      "center_x": "50%",
+      "center_y": "50%",
+      "radius_x": "100%",
+      "radius_y": "100%",
+      "color1": "#08106E",
+      "color2": "#35E2FC",
+      "opacity": 0.3,
+      "noise_scale": 1.8,
+      "strength": 0.6
+    }
+  ]
+}
