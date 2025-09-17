@@ -50,8 +50,11 @@ class Posteragent:
             return f"Error generating response: {str(e)}"
     
     async def build_context(self,input: str,phase:str) -> str:
-        return input
-    
+        context = ""
+        if phase == "Canvas":
+            return 
+        elif phase == "Background":
+            return
     async def build_tools(self,phase:str) -> list:
         if phase == "Canvas":
             return [Tool_config.canvas_tool]
