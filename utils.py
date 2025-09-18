@@ -1,4 +1,8 @@
 def hex_to_rgba(hex_str, alpha=255):
+    # Handle transparent keyword
+    if hex_str.lower() == "transparent":
+        return (0, 0, 0, 0)
+    
     hex_str = hex_str.lstrip('#')
     if len(hex_str) == 8:
         r, g, b = tuple(int(hex_str[i:i+2], 16) for i in (0, 2, 4))
