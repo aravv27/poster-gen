@@ -786,131 +786,130 @@ if __name__ == "__main__":
     # Example with constraints and flexbox layout
     testing = {
   "container": {
-    "width": 1920,
-    "height": 1080,
+    "width": 1200,
+    "height": 800,
     "column": {
       "children": [
         {
-          "height": "33.33%",
-          "canvas": {
-            "width": 1920,
-            "height": 360,
-            "background": "#FF6B6B"
-          },
-          "layers": [
+            "canvas": {
+              "width": 1200,
+              "height": 160,
+              "background": "#FFFFFF"
+            },
+            "layers": [
               {
-                          "type": "text",
-                          "text": "RANDOM TEXT",
-                          "size": 180,
-                          "color": "#0F1314",
-                          "x": "0%",
-                          "y": "0%",
-                          "anchor": "center"
-                        }
-              
-          ]
-        },
-        {
-          "height": "33.33%",
-          "canvas": {
-            "width": 1920,
-            "height": 360,
-            "background": "#4ECDC4"
-          },
-          "layers": []
-        },
-        {
-          "height": "33.34%",
-          "row": {
-            "children": [
-              {
-                "width": "25%",
-                "canvas": {
-                  "width": 480,
-                  "height": 360,
-                  "background": "#45B7D1"
-                },
-                "layers": [
-                    {
-                          "type": "text",
-                          "text": "RANDOM TEXT",
-                          "size": 180,
-                          "color": "#0F1314",
-                          "x": "0%",
-                          "y": "0%",
-                          "anchor": "center"
-                        }
-                ]
+                "type": "color_overlay",
+                "color": "#F0F4F8",
+                "x": 0,
+                "y": 0,
+                "anchor": "top-left",
+                "opacity": 1.0,
+                "blur": 0
               },
               {
-                "width": "25%",
-                "canvas": {
-                  "width": 480,
-                  "height": 360,
-                  "background": "#96CEB4"
-                },
-                "layers": []
-              },
-              {
-                "width": "25%",
-                "stack": {
-                  "children": [
-                    {
-                      "canvas": {
-                        "width": 480,
-                        "height": 360,
-                        "background": "#A7FFC7"
-                      },
-                      "layers": []
-                    },
-                    {
-                      "canvas": {
-                        "width": 480,
-                        "height": 360,
-                        "background": "#ffffff"
-                      },
-                      "layers": [
-                        {
-                          "type": "gradient",
-                          "gradient_type": "radial",
-                          "colors": ["#8D37C3", "#7674FF", "#5F1EDA"],
-                          "stops": [0, 0.5, 1],
-                          "x": "50%",
-                          "y": "50%",
-                          "width": "100%",
-                          "height": "100%",
-                          "opacity": 0.8
-                        },
-                        {
-                          "type": "text",
-                          "text": "RANDOM TEXT",
-                          "size": 180,
-                          "color": "#0F1314",
-                          "x": "0%",
-                          "y": "0%",
-                          "anchor": "center"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              },
-              {
-                "width": "25%",
-                "canvas": {
-                  "width": 480,
-                  "height": 360,
-                  "background": "#DDA0DD"
-                },
-                "layers": []
+                "type": "shape",
+                "shape": "polygon",
+                "color": "#87CEEB",
+                "points": [
+                  ["0", "0"],
+                  ["1200", "0"],
+                  ["1200", "140"],
+                  ["0", "160"]
+                ],
+                "opacity": 1.0,
+                "blur": 0
               }
-            ]
-          }
+            ],
+          "height": "20%",
+        },
+        {
+            "canvas": {
+              "width": 1200,
+              "height": 480,
+              "background": "#FFFFFF"
+            },
+            "layers": [
+              {
+                "type": "gradient",
+                "gradient_type": "mesh",
+                "mesh_points": [
+                  {"y": "0%", "x": "0%", "color": "#D6E4F0"},
+                  {"color": "#A5C9E3", "x": "100%", "y": "0%"},
+                  {"x": "100%", "y": "100%", "color": "#7393B3"},
+                  {"x": "0%", "color": "#B0C4DE", "y": "100%"}
+                ],
+                "opacity": 1.0
+              },
+              {
+                "type": "text",
+                "text": "SUMMER SONIC",
+                "x": "50%",
+                "y": "50%",
+                "anchor": "center",
+                "size": 80,
+                "color": "#FFFFFF",
+                "align": "center",
+                "opacity": 1.0,
+                "weight": "normal",
+                "line_height": 1.0,
+                "letter_spacing": 0,
+                "font": "fonts/heavy_bold.ttf",
+                "transform": "uppercase",
+                "shadow": {
+                  "opacity": 0.3,
+                  "offset_x": 2,
+                  "color": "#000000",
+                  "offset_y": 2
+                }
+              }
+            ],
+          "height": "60%"
+        },
+        {
+          
+            "canvas": {
+              "width": 1200,
+              "height": 160,
+              "background": "#FFFFFF"
+            },
+            "layers": [
+              {
+                "type": "color_overlay",
+                "color": "#F0F4F8",
+                "x": 0,
+                "y": 0,
+                "anchor": "top-left",
+                "opacity": 1.0,
+                "blur": 0
+              },
+              {
+                "type": "image",
+                "src": "images/background.jpg",
+                "x": 0,
+                "y": 0,
+                "anchor": "top-left",
+                "opacity": 1.0,
+                "width": "100%",
+                "height": "100%",
+                "filters": [
+                  {
+                    "radius": 2,
+                    "type": "gaussian_blur"
+                  },
+                  {
+                    "brightness": 0.8,
+                    "type": "brightness_contrast"
+                  }
+                ]
+              }
+            ],
+          "height": "20%"
         }
       ]
     }
   }
 }
+
 
     # Render different examples
     renderer = WidgetTreeRenderer(1920, 1080)

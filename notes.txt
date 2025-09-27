@@ -51,3 +51,89 @@
         }
     }
 }
+{
+  "container": {
+    "width": 1920,
+    "height": 1080,
+    "column": {
+      "children": [
+        {
+          "height": "33.33%",
+          "canvas": "placeholder"
+        },
+        {
+          "height": "33.33%",
+          "canvas": "placeholder"
+        },
+      ]
+    }
+  }
+}
+
+{
+  "container": {
+    "width": 1920,
+    "height": 1080,
+    "column": {
+      "children": [
+        {
+          "height": "33.33%",
+          "canvas": {
+            "width": 1920,
+            "height": 360,
+            "background": "#FF6B6B"
+          },
+          
+        },
+        {
+          "height": "33.33%",
+          "canvas": {
+            "width": 1920,
+            "height": 360,
+            "background": "#4ECDC4"
+          },
+          
+        },
+      ]
+    }
+  }
+}
+{
+  "container": {
+    "width": 1920,
+    "height": 1080,
+    "column": {
+      "children": [
+        {
+          "height": "33.33%",
+          "canvas": {
+            "width": 1920,
+            "height": 360,
+            "background": "#FF6B6B"
+          },
+          "layers": [
+              {
+                          "type": "text",
+                          "text": "RANDOM TEXT",
+                          "size": 180,
+                          "color": "#0F1314",
+                          "x": "0%",
+                          "y": "0%",
+                          "anchor": "center"
+                        }
+              
+          ]
+        },
+        {
+          "height": "33.33%",
+          "canvas": {
+            "width": 1920,
+            "height": 360,
+            "background": "#4ECDC4"
+          },
+          "layers": []
+        },
+      ]
+    }
+  }
+}
