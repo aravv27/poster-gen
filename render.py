@@ -180,7 +180,14 @@ class Canvas(Widget):
         return self.computed_size
     
     def render(self, x: int, y: int, constraints: BoxConstraints) -> Image.Image:
+
         """Render canvas with padding and background"""
+        print(f"Canvas render called with computed_size: {self.computed_size}")
+    
+        if self.computed_size is None:
+            print(f"ERROR: Canvas computed_size is None!")
+            print(f"Canvas dimensions: {self.width}x{self.height}")
+            print(f"Constraints: {constraints}")
         total_width, total_height = self.computed_size
         
         # Create full image with padding
@@ -786,131 +793,181 @@ if __name__ == "__main__":
     # Example with constraints and flexbox layout
     testing = {
   "container": {
-    "width": 1200,
-    "height": 800,
+    "width": 1920,
+    "height": 1080,
     "column": {
       "children": [
         {
-            "canvas": {
-              "width": 1200,
-              "height": 160,
-              "background": "#FFFFFF"
+          "canvas": {
+            "width": 1920,
+            "height": 216,
+            "background": "#19202e"
+          },
+          "layers": [
+            {
+              "type": "gradient",
+              "gradient_type": "linear",
+              "colors": [
+                "#19202e",
+                "#232946"
+              ],
+              "angle": 90,
+              "opacity": 1.0,
+              "anchor": "top-left",
+              "width": 1920,
+              "height": 216
             },
-            "layers": [
-              {
-                "type": "color_overlay",
-                "color": "#F0F4F8",
-                "x": 0,
-                "y": 0,
-                "anchor": "top-left",
-                "opacity": 1.0,
-                "blur": 0
-              },
-              {
-                "type": "shape",
-                "shape": "polygon",
-                "color": "#87CEEB",
-                "points": [
-                  ["0", "0"],
-                  ["1200", "0"],
-                  ["1200", "140"],
-                  ["0", "160"]
-                ],
-                "opacity": 1.0,
-                "blur": 0
-              }
-            ],
-          "height": "20%",
+            {
+              "type": "shape",
+              "shape": "ellipse",
+              "color": "#232946",
+              "x": 0,
+              "y": 0,
+              "width": 1920,
+              "height": 216,
+              "anchor": "top-left",
+              "opacity": 0.7,
+              "blur": 100
+            }
+          ],
+          "width": "100%",
+          "height": "20.0%"
         },
         {
-            "canvas": {
-              "width": 1200,
-              "height": 480,
-              "background": "#FFFFFF"
+          "canvas": {
+            "width": 1920,
+            "height": 216,
+            "background": "#232946"
+          },
+          "layers": [
+            {
+              "type": "gradient",
+              "gradient_type": "radial",
+              "x": "70%",
+              "y": "30%",
+              "opacity": 0.7,
+              "anchor": "top-left",
+              "colors": [
+                "#3066be",
+                "#19202e"
+              ],
+              "width": "100%",
+              "height": "100%"
             },
-            "layers": [
-              {
-                "type": "gradient",
-                "gradient_type": "mesh",
-                "mesh_points": [
-                  {"y": "0%", "x": "0%", "color": "#D6E4F0"},
-                  {"color": "#A5C9E3", "x": "100%", "y": "0%"},
-                  {"x": "100%", "y": "100%", "color": "#7393B3"},
-                  {"x": "0%", "color": "#B0C4DE", "y": "100%"}
-                ],
-                "opacity": 1.0
-              },
-              {
-                "type": "text",
-                "text": "SUMMER SONIC",
-                "x": "50%",
-                "y": "50%",
-                "anchor": "center",
-                "size": 80,
-                "color": "#FFFFFF",
-                "align": "center",
-                "opacity": 1.0,
-                "weight": "normal",
-                "line_height": 1.0,
-                "letter_spacing": 0,
-                "font": "fonts/heavy_bold.ttf",
-                "transform": "uppercase",
-                "shadow": {
-                  "opacity": 0.3,
-                  "offset_x": 2,
-                  "color": "#000000",
-                  "offset_y": 2
+            {
+              "type": "shape",
+              "shape": "ellipse",
+              "color": "#3066be",
+              "x": -100,
+              "y": 50,
+              "width": 800,
+              "height": 150,
+              "anchor": "top-left",
+              "opacity": 0.4,
+              "blur": 120
+            }
+          ],
+          "width": "100%",
+          "height": "20.0%"
+        },
+        {
+          "canvas": {
+            "width": 1920,
+            "height": 216,
+            "background": "#3066be"
+          },
+          "layers": [
+            {
+              "type": "gradient",
+              "gradient_type": "shape_blur",
+              "colors": [
+                "#6fd1fb",
+                "#3066be"
+              ],
+              "shape_gradient_type": "linear",
+              "shape": "ellipse",
+              "shape_x": "20%",
+              "shape_y": "20%",
+              "shape_width": "60%",
+              "shape_height": "60%",
+              "blur_radius": 50,
+              "opacity": 0.5
+            }
+          ],
+          "width": "100%",
+          "height": "20.0%"
+        },
+        {
+          "canvas": {
+            "width": 1920,
+            "height": 216,
+            "background": "#9a89d9"
+          },
+          "layers": [
+            {
+              "type": "gradient",
+              "gradient_type": "mesh",
+              "mesh_points": [
+                {
+                  "y": "0%",
+                  "x": "0%",
+                  "color": "#232946"
+                },
+                {
+                  "color": "#3066be",
+                  "y": "0%",
+                  "x": "100%"
+                },
+                {
+                  "y": "100%",
+                  "x": "0%",
+                  "color": "#9a89d9"
+                },
+                {
+                  "y": "100%",
+                  "color": "#19202e",
+                  "x": "100%"
+                },
+                {
+                  "y": "50%",
+                  "color": "#6fd1fb",
+                  "x": "50%"
                 }
-              }
-            ],
-          "height": "60%"
+              ],
+              "opacity": 0.9
+            }
+          ],
+          "width": "100%",
+          "height": "20.0%"
         },
         {
-          
-            "canvas": {
-              "width": 1200,
-              "height": 160,
-              "background": "#FFFFFF"
-            },
-            "layers": [
-              {
-                "type": "color_overlay",
-                "color": "#F0F4F8",
-                "x": 0,
-                "y": 0,
-                "anchor": "top-left",
-                "opacity": 1.0,
-                "blur": 0
-              },
-              {
-                "type": "image",
-                "src": "images/background.jpg",
-                "x": 0,
-                "y": 0,
-                "anchor": "top-left",
-                "opacity": 1.0,
-                "width": "100%",
-                "height": "100%",
-                "filters": [
-                  {
-                    "radius": 2,
-                    "type": "gaussian_blur"
-                  },
-                  {
-                    "brightness": 0.8,
-                    "type": "brightness_contrast"
-                  }
-                ]
-              }
-            ],
-          "height": "20%"
+          "canvas": {
+            "width": 1920,
+            "height": 216,
+            "background": "#6fd1fb"
+          },
+          "layers": [
+            {
+              "type": "gradient",
+              "gradient_type": "linear",
+              "colors": [
+                "#19202e",
+                "transparent"
+              ],
+              "angle": 45,
+              "opacity": 0.4,
+              "anchor": "top-left",
+              "width": 1920,
+              "height": 216
+            }
+          ],
+          "width": "100%",
+          "height": "20.0%"
         }
       ]
     }
   }
 }
-
-
     # Render different examples
     renderer = WidgetTreeRenderer(1920, 1080)
     

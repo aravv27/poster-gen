@@ -104,13 +104,22 @@ class Posteragent:
             
             response = await asyncio.to_thread(
                 client.models.generate_content,
-                model='gemini-2.5-pro',  # Use the correct model name
+                model='gemini-2.5-flash',  # Use the correct model name
                 contents=context,
                 config={'tools': [{'function_declarations': tool_list}]}  # Pass tools in the correct format
             )
             
             print("\nAPI Response:")
             print(response.candidates[0].content)
+
+            if response.candidates[0].content.parts is None:
+                print(f"\n⚠️ No function calls generated for {phase} phase")
+                print("This phase will be skipped (no assets needed)")
+            
+            # Use previous JSON as-is since no changes needed
+                if self.current_json:
+                    self.db.save_phase_result(self.current_project_id, phase, self.current_json)
+                return "Phase completed (no changes needed)"
             
             # Process response
             print("\nProcessing response parts...")
@@ -377,6 +386,7 @@ class Posteragent:
                 "TASK:\n"
                 "  - Output a single valid generate_layout TOOL CALL, nothing else.\n"
                 "  - NEVER write explanations, chat, or markdown.\n"
+                "All placeholders MUST only specify size (percent or pixel). No CSS, background, style, or visual data can appear in the layout string. For example: placeholder(10%), not placeholder(…, background: …) or similar. All background/design must be expressed later as layers"
                 "POSTER REQUEST:\n"
                 f"{input}\n"
                 "REQUIREMENTS:\n"
@@ -399,6 +409,8 @@ class Posteragent:
                 "- Always specify width, height, and background. Use JSON input for correct dimensions.\n"
                 f"- LAYOUT CONTEXT (read-only):\n{json.dumps(self.current_json, indent=2)}\n"
                 "Output NOTHING but valid generate_canvas calls in response."
+                "POSTER REQUEST:\n"
+                f"{input}\n"
             )
 
         elif phase.lower() == "background":
@@ -410,6 +422,8 @@ class Posteragent:
                 f"- CANVAS METADATA (read-only):\n{json.dumps(canvas_info, indent=2)}\n"
                 "- Do NOT output ANY natural language, markdown, or explanations.\n"
                 "Output valid background tool calls. Only that."
+                "POSTER REQUEST:\n"
+                f"{input}\n"
             )
 
         elif phase.lower() == "assets":
@@ -422,6 +436,8 @@ class Posteragent:
                 "- Do not chat, explain, or use markdown. Only emit valid tool calls—no text.\n"
                 f"- CANVAS CONTEXT:\n{json.dumps(canvas_info, indent=2)}\n"
                 "Place each tool call directly in your output, nothing else."
+                "POSTER REQUEST:\n"
+                f"{input}\n"
             )
 
         return ""
@@ -546,15 +562,26 @@ class Posteragent:
 
 async def main():
     agent = Posteragent()
-    user_prompt = """Design task: Create a modern tech startup poster with:
-    - Company logo at top
-    - Main content in middle
-    - Contact info at bottom
-    
-    Width: 1200px, Height: 800px
-    Style: Modern, clean, professional
-    Colors: Blue and white theme
-    """
+    user_prompt = """Design a poster background using only gradients—no images.
+    USE TEXT to tell some ideas. Dont miss the text.
+Create a layered, modern, and clean tech aesthetic reminiscent of AI, math, or digital transformation.
+
+Instructions:
+- Use multiple gradients (radial, linear, and mesh).
+- Emphasize blue, violet, cyan, and subtle dark shades for depth.
+- Create soft, glowing, blended transitions—no hard edges.
+- Add at least one or two overlapping gradients to form bright areas and subtle, digital-looking blends.
+- Use at least one mesh or multi-point radial gradient for a “datamap” or “AI” effect, with blended nodes or light regions.
+- Use dark blue/black as the base to keep the poster modern and tech-savvy.
+- No logos, or icons—color, transitions, and soft blurs only.
+- FILL ALL THE CANVAS NEEDED PROPERLY, DONT LEAVE ANY PLACEHOLDERS EMPTY
+
+Goal:
+- The effect should be futuristic, abstract, and hint at organized complexity (order-from-chaos), similar to cosmic or neural network visuals.
+- The background should be visually interesting, ready for a logo or text to be placed later, but should not itself contain any focal objects.
+
+Palette: #19202e, #232946, #3066be, #b0b9e7, #bbdfff, #aac7e7, #9a89d9, #e3eefa, #6fd1fb, #8c6be5
+"""
     print("\nStarting poster generation with prompt:", user_prompt)
     print("\nThis will go through multiple phases (Layout → Canvas → Background → Assets)")
     result = await agent.create_poster(user_prompt)

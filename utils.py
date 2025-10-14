@@ -30,7 +30,7 @@ def get_anchor_pos(anchor, img_w, img_h, ele_w, ele_h):
     if anchor is None or anchor == 'top-left':
         return 0, 0
     if anchor == 'center':
-        return x, y
+        return int((img_w - ele_w) / 2), int((img_h - ele_h) / 2)
     if anchor == 'top-center':
         return x, 0
     if anchor == 'center-left':

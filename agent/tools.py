@@ -244,14 +244,13 @@ class Tools:
         mesh_points: List[Dict[str, Union[str, int, float]]],
         opacity: float = 1.0
     ) -> Dict[str, Any]:
-        return {
-            "mesh_gradient": {
+        mesh_grad = {
                 "type": "gradient",
                 "gradient_type": "mesh",
                 "mesh_points": mesh_points,
                 "opacity": opacity
             }
-        }
+        return mesh_grad
     
     @staticmethod
     def generate_shape_blur_gradient(
