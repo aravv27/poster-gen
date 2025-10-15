@@ -2,7 +2,6 @@ import os
 from google import genai
 import asyncio
 import json
-import sqlite3
 from typing import Dict, List, Optional
 from pydantic import BaseModel
 from tools import Tools
