@@ -11,10 +11,10 @@ import traceback
 from datetime import datetime
 
 # Import your existing modules
-from agent.main import Posteragent
-from agent.translator import translate_canvas_numbering
+from main import Posteragent
+from translator import translate_canvas_numbering
 from render import WidgetTreeRenderer
-from agent.database import DatabaseManager, ProjectStatus, PhaseType
+from database import DatabaseManager, ProjectStatus, PhaseType
 import sqlite3
 
 # ==================== Database Setup ====================
@@ -149,7 +149,7 @@ async def process_poster_generation(job_id: str, prompt: str, width: int, height
         agent.current_project_id = job_id  # Use the job_id as project_id
         
         print(f"[{job_id}] Phase 2/4: Running multi-phase generation...")
-        result_json_str = await agent.create_poster(prompt)
+        result_json_str = await agent.create_poster(prompt, project_id=job_id)
         
         # Check if there was an error
         if "Error" in result_json_str or "Failed" in result_json_str:
