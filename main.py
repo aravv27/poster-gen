@@ -394,6 +394,7 @@ class Posteragent:
                 "  - Use 'container(widthxheight)[content]' syntax ONLY.\n"
                 "  - Use only the following structure keywords: container, row, column, stack, placeholder.\n"
                 "  - Each call must cover the FULL layout as a single tree.\n"
+                "  - Initial container size can only be in pixels. if given container(100%x100%), will convert into container(1920x1080)"
                 "EXAMPLES:\n"
                 "  - container(800x600)[column[placeholder(20%), placeholder(60%), placeholder(20%)]]\n"
                 "  - container(800x600)[row[placeholder(50%), placeholder(50%)]]\n"

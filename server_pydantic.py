@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, Dict
 class GenerateRequest(BaseModel):
     prompt: str
@@ -17,6 +17,7 @@ class StatusResponse(BaseModel):
     progress: int  # 0-100
     message: str
     image_ready: bool = False
+    phases_rendered: Dict[str, bool] = Field(default_factory=dict)
 
 class ResultResponse(BaseModel):
     job_id: str
@@ -26,3 +27,4 @@ class ResultResponse(BaseModel):
     height: Optional[int] = None
     file_size: Optional[int] = None
     error: Optional[str] = None
+    phase: Optional[str] = None

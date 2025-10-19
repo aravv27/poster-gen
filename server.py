@@ -40,7 +40,7 @@ render_db = RenderDatabase()
 # ==================== Background Task ====================
 
 async def process_poster_generation(job_id: str, prompt: str, width: int, height: int):
-    """Background task to generate poster"""
+    """Background task to generate poster with all 4 phase images"""
     try:
         print(f"\n{'='*60}")
         print(f"Starting poster generation for job: {job_id}")
@@ -48,11 +48,11 @@ async def process_poster_generation(job_id: str, prompt: str, width: int, height
         print(f"{'='*60}\n")
         
         # Step 1: Run the agent through all phases
-        print(f"[{job_id}] Phase 1/4: Initializing PosterAgent...")
+        print(f"[{job_id}] Phase 1/5: Initializing PosterAgent...")
         agent = Posteragent()
-        agent.current_project_id = job_id  # Use the job_id as project_id
+        agent.current_project_id = job_id
         
-        print(f"[{job_id}] Phase 2/4: Running multi-phase generation...")
+        print(f"[{job_id}] Phase 2/5: Running multi-phase generation...")
         result_json_str = await agent.create_poster(prompt, project_id=job_id)
         
         # Check if there was an error
@@ -61,58 +61,99 @@ async def process_poster_generation(job_id: str, prompt: str, width: int, height
             db.update_project_status(job_id, ProjectStatus.FAILED)
             return
         
-        # Parse the JSON result
-        print(f"[{job_id}] Phase 3/4: Parsing and translating JSON...")
-        result_json = json.loads(result_json_str)
+        # Parse the final JSON result
+        print(f"[{job_id}] Phase 3/5: Parsing final JSON...")
+        final_json = json.loads(result_json_str)
         
-        # Step 2: Translate the JSON to render engine format
-        print(f"[{job_id}] Translating canvas numbering...")
-        translated_json = translate_canvas_numbering(result_json)
+        # Step 2: Retrieve all phase JSONs from database
+        print(f"[{job_id}] Phase 4/5: Retrieving all phase JSONs from database...")
+        all_phase_results = db.get_all_phase_results(job_id)
         
-        print(f"[{job_id}] Translated JSON structure:")
-        print(json.dumps(translated_json, indent=2))
+        if not all_phase_results:
+            print(f"[{job_id}] ❌ No phase results found in database")
+            db.update_project_status(job_id, ProjectStatus.FAILED)
+            return
         
-        # Step 3: Render the image
-        print(f"[{job_id}] Phase 4/4: Rendering image with WidgetTreeRenderer...")
-        renderer = WidgetTreeRenderer(width, height)
+        # Step 3: Render all 4 phases
+        print(f"[{job_id}] Phase 5/5: Rendering all 4 phase images...")
         
-        # Render to PIL Image instead of file
-        from render import WidgetTreeParser, BoxConstraints
-        root_widget = WidgetTreeParser.parse(translated_json)
-        root_constraints = BoxConstraints(width, width, height, height)
-        root_widget.calculate_size(root_constraints)
-        final_image = root_widget.render(0, 0, root_constraints)
+        phases_to_render = ['layout', 'canvas', 'background', 'assets']
+        rendered_count = 0
         
-        # Convert RGBA to RGB if needed
-        if final_image.mode == 'RGBA':
-            from PIL import Image
-            background = Image.new('RGB', final_image.size, (255, 255, 255))
-            background.paste(final_image, mask=final_image.split()[3])
-            final_image = background
+        for phase in phases_to_render:
+            try:
+                print(f"[{job_id}] Rendering {phase} phase...")
+                
+                # Get the JSON for this phase
+                phase_data = all_phase_results.get(phase)
+                if not phase_data:
+                    print(f"[{job_id}] ⚠️  No data for {phase} phase, skipping...")
+                    continue
+                
+                phase_json = phase_data['json_data']
+                
+                # Translate the JSON for this specific phase
+                translated_json = translate_canvas_numbering(phase_json, phase=phase)
+                
+                print(f"[{job_id}] Translated {phase} JSON structure:")
+                print(json.dumps(translated_json, indent=2)[:500] + "...")
+                
+                # Render the image
+                renderer = WidgetTreeRenderer(width, height)
+                
+                from render import WidgetTreeParser, BoxConstraints
+                root_widget = WidgetTreeParser.parse(translated_json)
+                root_constraints = BoxConstraints(width, width, height, height)
+                root_widget.calculate_size(root_constraints)
+                phase_image = root_widget.render(0, 0, root_constraints)
+                
+                # Convert RGBA to RGB if needed
+                if phase_image.mode == 'RGBA':
+                    from PIL import Image
+                    background = Image.new('RGB', phase_image.size, (255, 255, 255))
+                    background.paste(phase_image, mask=phase_image.split()[3])
+                    phase_image = background
+                
+                # Convert PIL Image to bytes
+                img_byte_arr = io.BytesIO()
+                phase_image.save(img_byte_arr, format='PNG', quality=95)
+                img_bytes = img_byte_arr.getvalue()
+                
+                # Save to database with phase
+                render_db.save_image(
+                    job_id=job_id,
+                    image_bytes=img_bytes,
+                    width=phase_image.width,
+                    height=phase_image.height,
+                    phase=phase,
+                    image_format='png'
+                )
+                
+                rendered_count += 1
+                print(f"[{job_id}] ✅ {phase} image saved ({len(img_bytes)} bytes)")
+                
+            except Exception as phase_error:
+                print(f"[{job_id}] ❌ Error rendering {phase}: {str(phase_error)}")
+                print(f"Traceback:\n{traceback.format_exc()}")
+                # Continue with other phases even if one fails
+                continue
         
-        # Convert PIL Image to bytes
-        print(f"[{job_id}] Converting image to bytes...")
-        img_byte_arr = io.BytesIO()
-        final_image.save(img_byte_arr, format='PNG', quality=95)
-        img_bytes = img_byte_arr.getvalue()
-        
-        # Step 4: Save to database
-        print(f"[{job_id}] Saving image to database...")
-        render_db.save_image(
-            job_id=job_id,
-            image_bytes=img_bytes,
-            width=final_image.width,
-            height=final_image.height,
-            image_format='png'
-        )
-        
-        # Update project status to completed
-        db.update_project_status(job_id, ProjectStatus.COMPLETED)
-        
-        print(f"\n{'='*60}")
-        print(f"✅ Poster generation completed for job: {job_id}")
-        print(f"Image size: {len(img_bytes)} bytes ({final_image.width}x{final_image.height})")
-        print(f"{'='*60}\n")
+        # Update project status
+        if rendered_count == 4:
+            db.update_project_status(job_id, ProjectStatus.COMPLETED)
+            print(f"\n{'='*60}")
+            print(f"✅ All 4 phases rendered successfully for job: {job_id}")
+            print(f"{'='*60}\n")
+        elif rendered_count > 0:
+            db.update_project_status(job_id, ProjectStatus.PARTIAL)
+            print(f"\n{'='*60}")
+            print(f"⚠️  Partial completion: {rendered_count}/4 phases rendered for job: {job_id}")
+            print(f"{'='*60}\n")
+        else:
+            db.update_project_status(job_id, ProjectStatus.FAILED)
+            print(f"\n{'='*60}")
+            print(f"❌ No phases rendered for job: {job_id}")
+            print(f"{'='*60}\n")
         
     except Exception as e:
         print(f"\n{'='*60}")
@@ -121,7 +162,6 @@ async def process_poster_generation(job_id: str, prompt: str, width: int, height
         print(f"Traceback:\n{traceback.format_exc()}")
         print(f"{'='*60}\n")
         
-        # Update project status to failed
         db.update_project_status(job_id, ProjectStatus.FAILED)
 
 
@@ -168,13 +208,8 @@ async def generate_poster(request: GenerateRequest, background_tasks: Background
 
 @app.get("/api/status/{job_id}", response_model=StatusResponse)
 async def get_status(job_id: str):
-    """
-    Get the current status of a poster generation job
-    
-    Returns progress, current phase, and completion status
-    """
+    """Get the current status of a poster generation job"""
     try:
-        # Get project from database
         project = db.get_project(job_id)
         
         if not project:
@@ -183,29 +218,22 @@ async def get_status(job_id: str):
         status = project['status']
         current_phase = project.get('current_phase', 'unknown')
         
-        # Calculate progress based on completed phases
-        phase_progress = {
-            'layout': 25,
-            'canvas': 50,
-            'background': 75,
-            'assets': 100
-        }
+        # Get which phases have been rendered
+        phases_rendered = render_db.get_rendered_phases(job_id)
         
-        progress = phase_progress.get(current_phase, 0)
+        # Calculate progress based on rendered phases
+        rendered_count = sum(phases_rendered.values())
+        progress = int((rendered_count / 4) * 100)
         
-        # Check if image is ready
-        image_ready = False
-        if status == ProjectStatus.COMPLETED:
-            image_data = render_db.get_image(job_id)
-            image_ready = image_data is not None
-            progress = 100
+        # Check if all images are ready
+        image_ready = (status == ProjectStatus.COMPLETED and rendered_count == 4)
         
         # Create status message
         message_map = {
             ProjectStatus.ACTIVE: f"Processing {current_phase} phase...",
-            ProjectStatus.COMPLETED: "Poster generation completed!",
+            ProjectStatus.COMPLETED: "All phases completed!",
             ProjectStatus.FAILED: "Poster generation failed",
-            ProjectStatus.PARTIAL: f"Partially completed (stopped at {current_phase})"
+            ProjectStatus.PARTIAL: f"Partially completed ({rendered_count}/4 phases)"
         }
         
         return StatusResponse(
@@ -214,25 +242,37 @@ async def get_status(job_id: str):
             current_phase=current_phase,
             progress=progress,
             message=message_map.get(status, "Unknown status"),
-            image_ready=image_ready
+            image_ready=image_ready,
+            phases_rendered=phases_rendered  # Add this field to your StatusResponse model
         )
         
     except HTTPException:
         raise
     except Exception as e:
+        print(f"ERROR in get_status for job_id={job_id}: {e}")
+        print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Error checking status: {str(e)}")
 
 
-@app.get("/api/result/{job_id}", response_model=ResultResponse)
-async def get_result(job_id: str, format: str = "base64"):
+@app.get("/api/result/{job_id}")
+async def get_result(job_id: str, phase: str = "assets", format: str = "base64"):
     """
-    Get the final rendered poster image
+    Get the rendered poster image for a specific phase
     
     Parameters:
-    - format: 'base64' (returns JSON with base64 image) or 'binary' (returns raw image file)
+    - phase: 'layout', 'canvas', 'background', or 'assets' (default: 'assets')
+    - format: 'base64' (returns JSON) or 'binary' (returns raw image file)
     """
     try:
-        # Check if project exists and is completed
+        # Validate phase parameter
+        valid_phases = ['layout', 'canvas', 'background', 'assets']
+        if phase not in valid_phases:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Invalid phase. Must be one of: {', '.join(valid_phases)}"
+            )
+        
+        # Check if project exists
         project = db.get_project(job_id)
         
         if not project:
@@ -242,7 +282,7 @@ async def get_result(job_id: str, format: str = "base64"):
             return ResultResponse(
                 job_id=job_id,
                 status="processing",
-                error="Poster is still being generated. Check /api/status/{job_id}"
+                error=f"{phase} phase is still being generated"
             )
         
         if project['status'] == ProjectStatus.FAILED:
@@ -252,11 +292,14 @@ async def get_result(job_id: str, format: str = "base64"):
                 error="Poster generation failed"
             )
         
-        # Get image from database
-        image_data = render_db.get_image(job_id)
+        # Get image from database for specific phase
+        image_data = render_db.get_image(job_id, phase=phase)
         
         if not image_data:
-            raise HTTPException(status_code=404, detail="Rendered image not found")
+            raise HTTPException(
+                status_code=404, 
+                detail=f"Image for {phase} phase not found"
+            )
         
         if format == "binary":
             # Return raw image file
@@ -264,7 +307,7 @@ async def get_result(job_id: str, format: str = "base64"):
                 content=image_data['image_data'],
                 media_type=f"image/{image_data['image_format']}",
                 headers={
-                    "Content-Disposition": f"inline; filename=poster_{job_id}.{image_data['image_format']}"
+                    "Content-Disposition": f"inline; filename=poster_{job_id}_{phase}.{image_data['image_format']}"
                 }
             )
         else:
@@ -274,6 +317,7 @@ async def get_result(job_id: str, format: str = "base64"):
             return ResultResponse(
                 job_id=job_id,
                 status="completed",
+                phase=phase,
                 image=f"data:image/{image_data['image_format']};base64,{base64_image}",
                 width=image_data['width'],
                 height=image_data['height'],
@@ -284,6 +328,45 @@ async def get_result(job_id: str, format: str = "base64"):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error retrieving result: {str(e)}")
+
+
+@app.get("/api/result/{job_id}/all")
+async def get_all_results(job_id: str):
+    """Get all 4 phase images at once"""
+    try:
+        project = db.get_project(job_id)
+        
+        if not project:
+            raise HTTPException(status_code=404, detail="Job not found")
+        
+        if project['status'] == ProjectStatus.ACTIVE:
+            return {"status": "processing", "message": "Images still being generated"}
+        
+        # Get all images
+        all_images = render_db.get_all_images(job_id)
+        
+        # Convert to base64
+        result = {
+            "job_id": job_id,
+            "status": project['status'],
+            "images": {}
+        }
+        
+        for phase, image_data in all_images.items():
+            base64_image = base64.b64encode(image_data['image_data']).decode('utf-8')
+            result["images"][phase] = {
+                "image": f"data:image/{image_data['image_format']};base64,{base64_image}",
+                "width": image_data['width'],
+                "height": image_data['height'],
+                "file_size": image_data['file_size']
+            }
+        
+        return result
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving results: {str(e)}")
 
 
 @app.get("/api/projects")
